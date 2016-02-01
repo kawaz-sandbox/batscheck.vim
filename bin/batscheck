@@ -9,7 +9,7 @@ for a in "$@"; do
     [[ -f "$t" ]] || exit 1
     tmps+=("$t")
     orgs+=("$a")
-    perl -MDigest::SHA1=sha1_hex -pe"s/^\\@test ([\"']).*\\1 \\{\$/\"test_\".sha1_hex(\$&).\"() {\"/e" <"$a" >"$t"
+    perl -pe's/^\@test\s.*\{$/"at_test_$. () {"/e' <"$a" >"$t"
     a=$t
   fi
   args+=("$a")
