@@ -9,10 +9,22 @@ for a in "$@"; do
     [[ -f "$t" ]] || exit 1
     tmps+=("$t")
     orgs+=("$a")
+    # convert @test line to dummy function definition
     perl -pe's/^\@test\s.*\{$/"at_test_$. () {"/e' <"$a" >"$t"
     a=$t
   fi
   args+=("$a")
 done
-exec 2> >(while read -r line; do for i in "${!tmps[@]}";do t=${tmps[$i]} o=${orgs[$i]}; [[ $line == "$t:"* ]] && line="$o${line#$t}"; done; printf "%s\n" "$line"; done  >&2)
+
+# revert filename, filter in stderr
+exec 2> >(
+while read -r line; do
+  for i in "${!tmps[@]}"; do
+    t=${tmps[$i]}
+    o=${orgs[$i]}
+    [[ $line == "$t:"* ]] && line="$o${line#$t}"
+  done
+  printf "%s\n" "$line"
+done>&2
+)
 bash "${args[@]}"
