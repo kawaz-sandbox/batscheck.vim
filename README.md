@@ -8,9 +8,9 @@ Add syntastic check for [Bats - Bash Automated Testing System](https://github.co
 ## Install
 
 ```vim:dsa
-NeoBundle 'scrooloose/syntastic'¬
-NeoBundle 'vim-scripts/bats.vim'¬
-NeoBundle 'kawaz/batscheck.vim'¬
+NeoBundle 'scrooloose/syntastic'
+NeoBundle 'vim-scripts/bats.vim'
+NeoBundle 'kawaz/batscheck.vim'
 ```
 
 ## Contact
