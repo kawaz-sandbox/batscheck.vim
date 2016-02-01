@@ -1,0 +1,15 @@
+#!/bin/bash
+args=()
+tmps=()
+trap 'for t in "${tmps[@]}";do [[ -f "$t" ]] && rm -f "$f"; done' HUP INT QUIT TERM
+for a in "$@"; do
+  if [[ $a == *.bats && -f $a ]]; then
+    t=$(mktemp)
+    [[ -f "$t" ]] || exit 1
+    tmps+=("$t")
+    perl -MDigest::SHA1=sha1_hex -pe"s/^\\@test ([\"']).*\\1 \\{\$/\"test_\".sha1_hex(\$&).\"() {\"/e" <"$a" >"$t"
+    a=$t
+  fi
+  args+=("$a")
+done
+bash "${args[@]}"
