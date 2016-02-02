@@ -1,0 +1,18 @@
+#!/bin/bash
+args=()
+tmps=()
+orgs=()
+trap 'for t in "${orgs[@]}";do [[ -f "$t" ]] && rm -f "$f"; done' HUP INT QUIT TERM
+for a in "$@"; do
+  if [[ $a == *.bats && -f $a ]]; then
+    t=$(mktemp)
+    [[ -f "$t" ]] || exit 1
+    tmps+=("$t")
+    orgs+=("$a")
+    perl -MDigest::SHA1=sha1_hex -pe"s/^\\@test ([\"']).*\\1 \\{\$/\"test_\".sha1_hex(\$&).\"() {\"/e" <"$a" >"$t"
+    a=$t
+  fi
+  args+=("$a")
+done
+exec 2> >(while read -r line; do for i in "${!tmps[@]}";do t=${tmps[$i]} o=${orgs[$i]}; [[ $line == "$t:"* ]] && line="$o${line#$t}"; done; printf "%s\n" "$line"; done  >&2)
+bash "${args[@]}"
