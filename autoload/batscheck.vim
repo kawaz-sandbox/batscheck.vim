@@ -33,11 +33,13 @@ function! batscheck#init()
     endif
     " let b:syntastic_sh_{checker.name}_exe = s:wrapper
     let b:syntastic_sh_{checker.name}_exec = s:wrapper
-    " Add original checker to checker_args
+    " Insert original checker to checker_args
     let b:syntastic_sh_{checker.name}_args = checker_exec
     if exists("g:syntastic_sh_".checker.name."_args")
-      let b:syntastic_sh_{checker.name}_args .= " "
-      let b:syntastic_sh_{checker.name}_args .= g:syntastic_sh_{checker.name}_args
+      let b:syntastic_sh_{checker.name}_args .= " ".g:syntastic_sh_{checker.name}_args
+    endif
+    if checker.args != ""
+      let b:syntastic_sh_{checker.name}_args .= " ".checker.args
     endif
   endfor
 endfunction
