@@ -1,18 +1,26 @@
 #!/bin/bash
-args=()
-wrapped=()
-orginal=()
+# echo "$(date +%Y%m%dT%H%M%S) $0 $*" >> /tmp/bashcheck.log
+type "$1" >/dev/null 2>&1 || exit
 
-# shellcheck disable=SC2154
-trap 'for f in "${original[@]}";do [[ -f "$f" ]] && rm -f "$f"; done' HUP INT QUIT TERM
+args=()
+wrapped_files=()
+original_files=()
+
+cleanup() {
+  local f
+  for f in "${original_files[@]}"; do
+    [[ -f "$f" ]] && rm -f "$f"
+  done
+}
+trap cleanup HUP INT QUIT TERM
 
 # filter contents
 for arg in "$@"; do
   if [[ $arg == *.bats && -f $arg ]]; then
     temp=$(mktemp)
     [[ -f "$temp" ]] || exit 1
-    wrapped+=("$temp")
-    original+=("$arg")
+    wrapped_files+=("$temp")
+    original_files+=("$arg")
     # convert @test to dummy function definition
     perl -pe's/^\@test\s.*\{/"at_test_$. () {"/e' <"$arg" >"$temp"
     arg=$temp
@@ -22,10 +30,10 @@ done
 
 # revert filenames in output
 revert_filenames() {
-  local line i
+  local line
   while read -r line; do
-    for i in "${!wrapped[@]}"; do
-      line=${line//"${wrapped[$i]}"/${original[$i]}}
+    for _ in "${!wrapped_files[@]}"; do
+      line=${line//"${wrapped_files[$_]}"/${original_files[$_]}}
     done
     printf "%s\n" "$line"
   done
