@@ -1,1 +1,1 @@
-au BufRead,BufNewFile *.bats :call batscheck#init()
+au BufRead,BufNewFile *.bats :call batscheck#initBuffer()
