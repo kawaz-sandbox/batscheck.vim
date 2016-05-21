@@ -1,5 +1,4 @@
-#!/bin/bash
-# echo "$(date +%Y%m%dT%H%M%S) $0 $*" >> /tmp/bashcheck.log
+#!/usr/bin/env bash
 type "$1" >/dev/null 2>&1 || exit
 
 args=()
